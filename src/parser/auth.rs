@@ -1,3 +1,4 @@
+use mongodb::event::command;
 use regex::Regex;
 use crate::models::event::Event;
 
@@ -16,7 +17,7 @@ pub fn parse(contents: &str) -> Vec<Event> {
             "ssh_login_failed",
         ),
         (
-            Regex::new(r"(\w+\s+\d+\s+\d+:\d+:\d+).*sudo.*USER=(\w+).*COMMAND=(.+)").unwrap(),
+            Regex::new(r"(\w+\s+\d+\s+\d+:\d+:\d+).*sudo:\s+(\w+).*COMMAND=(.+)").unwrap(),
             "sudo_command",
         ),
     ];
@@ -35,17 +36,25 @@ pub fn parse(contents: &str) -> Vec<Event> {
                     None => None,
                 };
 
-                let ip = match caps.get(3) {
-                    Some(m) => Some(m.as_str().to_string()),
-                    None => None,
+                let (ip, command) = match* event_type {
+                    "sudo_command" => (None, match caps.get(3){
+                        Some(m) => Some(m.as_str().to_string()),
+                        None => None,
+                     }),
+                    
+                   _ => (match caps.get(3){
+                        Some(m) => Some(m.as_str().to_string()),
+                        None => None,
+                     } , None),
                 };
-
+                
                 let event = Event {
                     timestamp,
                     source: "auth.log".to_string(),
                     user,
                     ip,
                     event_type: event_type.to_string(),
+                    command,
                     message: line.to_string(),
                 };
                 events.push(event);
