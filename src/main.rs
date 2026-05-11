@@ -5,11 +5,13 @@ mod detection;
 mod storage;
 mod output;
 
-use models::event::{Event, IntentResult};
+// use models::event::{Event, IntentResult};
 use std::fs::read_to_string;
-use parser::auth::parse as parse_auth;
-use parser::syslog::parse as parse_syslog;
-use parser::ufw::parse as parse_ufw;
+// use parser::auth::parse as parse_auth;
+// use parser::syslog::parse as parse_syslog;
+// use parser::ufw::parse as parse_ufw;
+use parser::nginx::parse as parse_nginx;
+
 
 
 fn main() { 
@@ -22,7 +24,11 @@ fn main() {
     // let parsed_content = parse_syslog(&syslogcontents);
     // println!("{:#?}", parsed_content);
 
-    let ufwcontents = read_to_string("logs/ufw.log").expect("Could not read file");
-    let parsed_content = parse_ufw(&ufwcontents);
+    // let ufwcontents = read_to_string("logs/ufw.log").expect("Could not read file");
+    // let parsed_content = parse_ufw(&ufwcontents);
+    // println!("{:#?}", parsed_content);
+
+    let nginxcontents = read_to_string("logs/nginx/access.log").expect("Could not read file");
+    let parsed_content = parse_nginx(&nginxcontents);
     println!("{:#?}", parsed_content);
 }
