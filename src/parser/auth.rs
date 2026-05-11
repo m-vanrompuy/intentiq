@@ -1,4 +1,3 @@
-use mongodb::event::command;
 use regex::Regex;
 use crate::models::event::Event;
 
