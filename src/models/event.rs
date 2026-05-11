@@ -7,6 +7,7 @@ pub struct Event {
     pub user: Option<String>,
     pub ip: Option<String>,
     pub event_type: String,
+    pub command: Option<String>,
     pub message: String,
 }
 
