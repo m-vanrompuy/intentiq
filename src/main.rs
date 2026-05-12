@@ -5,16 +5,14 @@ mod detection;
 mod storage;
 mod output;
 
-use models::event::{Event, IntentResult};
+// use models::event::{Event, IntentResult};
 use std::fs::read_to_string;
 use parser::auth::parse as parse_auth;
 use parser::syslog::parse as parse_syslog;
 use parser::ufw::parse as parse_ufw;
 use parser::nginx::parse as parse_nginx;
 use grouping::group;
-use detection::rules;
-
-use crate::detection::rules::analyze;
+use detection::rules::analyze;
 
 
 
@@ -53,10 +51,11 @@ fn main() {
     let actors = group(all_events);
     // println!("{:#?}",actors);
 
+    
     for (actor, events) in &actors {
     let results = analyze(actor, events);
         if !results.is_empty() {
-            println!("{:#?}", results);
+            println!("{:#?}", results);  
         }
     }
 
