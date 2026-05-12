@@ -1,3 +1,19 @@
+May  6 09:12:05 server systemd[1]: Started Session 100 of user john.
+May  6 09:13:20 server systemd[1]: Started Session 101 of user lisa.
 May  6 09:16:10 server systemd[1]: Started Session 102 of user root.
 May  6 09:16:15 server kernel: [12345.678] suspicious binary executed: /tmp/.x1
 May  6 09:16:20 server systemd[1]: Started Process ID 2020 (/tmp/.x1)
+May  6 09:17:35 server kernel: [12367.900] suspicious binary executed: /tmp/.update
+May  6 09:17:40 server systemd[1]: Started Process ID 2025 (/tmp/.update)
+May  6 09:18:05 server kernel: [12389.112] suspicious binary executed: /tmp/.sshd
+May  6 09:18:10 server systemd[1]: Started Process ID 2030 (/tmp/.sshd)
+May  6 09:20:05 server systemd[1]: Started Session 103 of user john.
+May  6 09:22:00 server systemd[1]: Started Session 104 of user deploy.
+May  6 09:30:05 server systemd[1]: Started Session 105 of user lisa.
+May  6 09:50:05 server systemd[1]: Started Session 106 of user deploy.
+May  6 10:00:10 server systemd[1]: Started Session 107 of user deploy.
+May  6 10:00:20 server kernel: [13000.000] suspicious binary executed: /tmp/.backdoor
+May  6 10:00:25 server systemd[1]: Started Process ID 2100 (/tmp/.backdoor)
+May  6 10:05:00 server systemd[1]: Started Session 108 of user john.
+May  6 10:10:00 server kernel: [13500.000] suspicious binary executed: /var/tmp/.cron
+May  6 10:10:05 server systemd[1]: Started Process ID 2150 (/var/tmp/.cron)

