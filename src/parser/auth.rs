@@ -5,7 +5,7 @@ pub fn parse(contents: &str) -> Vec<Event> {
     let mut events = Vec::new();
 
     //vec van tuples (Regex, &str)
-    let patterns = vec![ //unwrap later vervangen voor betere error handling? Regex::new() geeft een Result<Regex, Error>
+    let patterns = vec![ 
 
         (   //e.g. May  6 09:12:01 server sshd[1023]: Accepted password for john from 192.168.1.10 port 53422 ssh2
             Regex::new(r"(\w+\s+\d+\s+\d+:\d+:\d+).*sshd.*Accepted password for (\w+) from ([\d.]+)").unwrap(),

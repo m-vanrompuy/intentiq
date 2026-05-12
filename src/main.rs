@@ -5,30 +5,40 @@ mod detection;
 mod storage;
 mod output;
 
-// use models::event::{Event, IntentResult};
+use models::event::{Event, IntentResult};
 use std::fs::read_to_string;
-// use parser::auth::parse as parse_auth;
-// use parser::syslog::parse as parse_syslog;
-// use parser::ufw::parse as parse_ufw;
+use parser::auth::parse as parse_auth;
+use parser::syslog::parse as parse_syslog;
+use parser::ufw::parse as parse_ufw;
 use parser::nginx::parse as parse_nginx;
+use grouping::group;
 
 
 
 fn main() { 
     println!("intentiq - cybersecurity log analyzer");
-    // let authcontents = read_to_string("logs/auth.log").expect("Could not read file");
-    // let parsed_content = parse_auth(&authcontents);
-    // println!("{:#?}", parsed_content);
+    let authcontents = read_to_string("logs/auth.log").expect("Could not read file");
+    let parsed_content1 = parse_auth(&authcontents);
+    // println!("{:#?}", parsed_content1);
 
-    // let syslogcontents = read_to_string("logs/syslog").expect("Could not read file");
-    // let parsed_content = parse_syslog(&syslogcontents);
-    // println!("{:#?}", parsed_content);
+    let syslogcontents = read_to_string("logs/syslog").expect("Could not read file");
+    let parsed_content2 = parse_syslog(&syslogcontents);
+    // println!("{:#?}", parsed_content2);
 
-    // let ufwcontents = read_to_string("logs/ufw.log").expect("Could not read file");
-    // let parsed_content = parse_ufw(&ufwcontents);
-    // println!("{:#?}", parsed_content);
+    let ufwcontents = read_to_string("logs/ufw.log").expect("Could not read file");
+    let parsed_content3 = parse_ufw(&ufwcontents);
+    // println!("{:#?}", parsed_content3);
 
     let nginxcontents = read_to_string("logs/nginx/access.log").expect("Could not read file");
-    let parsed_content = parse_nginx(&nginxcontents);
-    println!("{:#?}", parsed_content);
+    let parsed_content4 = parse_nginx(&nginxcontents);
+    // println!("{:#?}", parsed_content4);
+
+    let mut all_events = Vec::new();
+    all_events.extend(parsed_content1);
+    all_events.extend(parsed_content2);
+    all_events.extend(parsed_content3);
+    all_events.extend(parsed_content4);
+
+    let actors = group(all_events);
+    println!("{:#?}",actors);
 }
