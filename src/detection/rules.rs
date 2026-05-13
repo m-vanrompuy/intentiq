@@ -7,15 +7,44 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
     let mut failed_login_messages: Vec<String> = Vec::new();
     let mut success_login_message: Option<String> = None;
 
+    let mut had_session = false;
+    let mut had_sudo = false;
+    let mut sudo_messages: Vec<String> = Vec::new();
+    let mut had_suspicious_binary = false;
+    let mut suspicious_binary_messages: Vec<String> = Vec::new();
+
+
+
     for event in events {
         if event.event_type == "ssh_login_failed" {
             login_count += 1;
             failed_login_messages.push(event.message.clone());
-        } else if event.event_type == "ssh_login_success" {
+        } 
+        
+        if event.event_type == "ssh_login_success" {
             success_login_message = Some(event.message.clone());
+        }
+
+        if event.event_type == "session_started" {
+            had_session = true;
+        }
+
+       if event.event_type == "sudo_command" {
+            if let Some(cmd) = &event.command {
+                if cmd.contains("/tmp") || cmd.contains("/bin/bash") || cmd.contains("wget") {
+                    had_sudo = true;
+                    sudo_messages.push(event.message.clone());
+                }
+            }
+        }
+
+        if event.event_type == "suspicious_binary" {
+            had_suspicious_binary = true; 
+            suspicious_binary_messages.push(event.message.clone());
         }
     }
 
+    //reconnaissance rule
     if login_count >= 10 {
         results.push(IntentResult {
             actor: actor.to_string(),
@@ -25,6 +54,7 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
         });
     }
 
+    //credential_access rule
     if login_count > 3 && success_login_message.is_some() {
         let mut evidence = failed_login_messages.clone();
         if let Some(msg) = &success_login_message {
@@ -35,6 +65,37 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
             intent: "credential_access".to_string(),
             confidence: 0.85,
             evidence,
+        });
+    }
+
+    // privilege escalation + persistence gecombineerd
+    // TODO: suspicious_binary events worden apart gegroepeerd van SSH login events
+    // omdat ze geen IP of user hebben in syslog. Actor-linking is nog niet geïmplementeerd.
+    // Zie issue #11 voor de oplossing.
+    if had_session && had_sudo && had_suspicious_binary {
+        results.push(IntentResult {
+            actor: actor.to_string(),
+            intent: "privilege_escalation + persistence".to_string(),
+            confidence: 0.90,
+            evidence: {
+                let mut e = sudo_messages.clone();
+                e.extend(suspicious_binary_messages.clone());
+                e
+            },
+        });
+    } else if had_session && had_sudo {
+        results.push(IntentResult {
+            actor: actor.to_string(),
+            intent: "privilege_escalation".to_string(),
+            confidence: 0.70,
+            evidence: sudo_messages.clone(),
+        });
+    } else if had_suspicious_binary {
+        results.push(IntentResult {
+            actor: actor.to_string(),
+            intent: "persistence".to_string(),
+            confidence: 0.50,
+            evidence: suspicious_binary_messages.clone(),
         });
     }
 
