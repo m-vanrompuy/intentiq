@@ -13,6 +13,9 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
     let mut had_suspicious_binary = false;
     let mut suspicious_binary_messages: Vec<String> = Vec::new();
 
+    let mut firewall_block_count: i32 = 0;
+    let mut firewall_block_messages: Vec<String> = Vec::new();
+
 
 
     for event in events {
@@ -42,6 +45,12 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
             had_suspicious_binary = true; 
             suspicious_binary_messages.push(event.message.clone());
         }
+
+        if event.event_type == "firewall_block" {
+            firewall_block_count += 1; 
+            firewall_block_messages.push(event.message.clone());
+        }
+
     }
 
     //reconnaissance rule
@@ -96,6 +105,16 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
             intent: "persistence".to_string(),
             confidence: 0.50,
             evidence: suspicious_binary_messages.clone(),
+        });
+    }
+
+    // reconnaissance rule / port scanning via firewall blocks
+    if firewall_block_count >= 5 {
+        results.push(IntentResult {
+            actor: actor.to_string(),
+            intent: "reconnaissance".to_string(),
+            confidence: 0.80,
+            evidence: firewall_block_messages.clone(),
         });
     }
 
