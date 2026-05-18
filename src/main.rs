@@ -13,10 +13,14 @@ use parser::ufw::parse as parse_ufw;
 use parser::nginx::parse as parse_nginx;
 use grouping::group;
 use detection::rules::analyze;
+use storage::mongo;
+
+use crate::storage::mongo::{save_events, save_results};
 
 
 
-fn main() { 
+#[tokio::main]
+async fn main() {
     println!(r#"
  _       _             _   _         
 (_)_ __ | |_ ___ _ __ | |_(_) __ _  
@@ -26,6 +30,8 @@ fn main() {
                                |___/  
 "#);
     println!("  cybersecurity log analyzer\n");
+
+    let client = mongo::connect().await;
 
     let authcontents = read_to_string("logs/auth.log").expect("Could not read file");
     let parsed_content1 = parse_auth(&authcontents);
@@ -48,15 +54,20 @@ fn main() {
     all_events.extend(parsed_content2);
     all_events.extend(parsed_content3);
     all_events.extend(parsed_content4);
+    let all_events_copy = all_events.clone();
     let actors = group(all_events);
     // println!("{:#?}",actors);
 
-    
+    let mut all_results= Vec::new();
+
     for (actor, events) in &actors {
     let results = analyze(actor, events);
         if !results.is_empty() {
+            all_results.extend(results.clone());
             println!("{:#?}", results);  
         }
     }
 
+    save_events(&client, all_events_copy).await;
+    save_results(&client, all_results).await;
 }
