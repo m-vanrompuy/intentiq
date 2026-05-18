@@ -16,7 +16,7 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
     let mut firewall_block_count: i32 = 0;
     let mut firewall_block_messages: Vec<String> = Vec::new();
 
-
+    let mut data_exfiltration: Vec<String> = Vec::new();
 
     for event in events {
         if event.event_type == "ssh_login_failed" {
@@ -50,6 +50,15 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
             firewall_block_count += 1; 
             firewall_block_messages.push(event.message.clone());
         }
+
+        if event.event_type == "http_success" {
+            if let Some(size) = event.size {
+                if size >= 50000 {
+                    data_exfiltration.push(event.message.clone());
+                }
+            }
+        }
+
 
     }
 
@@ -115,6 +124,16 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
             intent: "reconnaissance".to_string(),
             confidence: 0.80,
             evidence: firewall_block_messages.clone(),
+        });
+    }
+
+    // data_exfiltration rule
+    if !data_exfiltration.is_empty() {
+        results.push(IntentResult {
+            actor: actor.to_string(),
+            intent: "data_exfiltration".to_string(),
+            confidence: 0.88,
+            evidence: data_exfiltration.clone(),
         });
     }
 

@@ -46,6 +46,8 @@ pub fn parse(contents: &str) -> Vec<Event> {
                         None => None,
                      } , None),
                 };
+
+                let size = None;
                 
                 let event = Event {
                     timestamp,
@@ -55,6 +57,7 @@ pub fn parse(contents: &str) -> Vec<Event> {
                     event_type: event_type.to_string(),
                     command,
                     message: line.to_string(),
+                    size,
                 };
                 events.push(event);
                 

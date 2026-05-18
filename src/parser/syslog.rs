@@ -42,6 +42,8 @@ pub fn parse(contents: &str) -> Vec<Event> {
                     }),
                 };
 
+                let size = None;
+
                 let event = Event {
                     timestamp,
                     source: "syslog".to_string(),
@@ -50,6 +52,7 @@ pub fn parse(contents: &str) -> Vec<Event> {
                     event_type: event_type.to_string(),
                     command,
                     message: line.to_string(),
+                    size,
                 };
             
                 events.push(event);
