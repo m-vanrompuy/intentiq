@@ -9,6 +9,7 @@ pub struct Event {
     pub event_type: String,
     pub command: Option<String>,
     pub message: String,
+    pub size: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

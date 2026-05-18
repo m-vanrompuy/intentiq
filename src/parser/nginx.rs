@@ -6,19 +6,19 @@ pub fn parse(contents: &str) -> Vec<Event> {
 
     let patterns = vec![ 
         (  //e.g. 192.168.1.10 - - [06/May/2026:09:10:01 +0000] "GET /index.html HTTP/1.1" 200 1024
-            Regex::new(r#"([\d.]+)\s-\s-\s\[([^\]]*)\]\s\"([^\"]+)\"\s2\d\d\s"#).unwrap(),
+            Regex::new(r#"([\d.]+)\s-\s-\s\[([^\]]*)\]\s\"([^\"]+)\"\s2\d\d\s(\d+)$"#).unwrap(),
             "http_success", //200
         ),
         (
-            Regex::new(r#"([\d.]+)\s-\s-\s\[([^\]]*)\]\s\"([^\"]+)\"\s404"#).unwrap(),
+            Regex::new(r#"([\d.]+)\s-\s-\s\[([^\]]*)\]\s\"([^\"]+)\"\s404\s(\d+)$"#).unwrap(),
             "http_not_found", //404
         ),
         (
-            Regex::new(r#"([\d.]+)\s-\s-\s\[([^\]]*)\]\s\"([^\"]+)\"\s403"#).unwrap(),
+            Regex::new(r#"([\d.]+)\s-\s-\s\[([^\]]*)\]\s\"([^\"]+)\"\s403\s(\d+)$"#).unwrap(),
             "http_forbidden", //403
         ),
         (
-            Regex::new(r#"([\d.]+)\s-\s-\s\[([^\]]*)\]\s\"([^\"]+)\"\s5\d\d\s"#).unwrap(),
+            Regex::new(r#"([\d.]+)\s-\s-\s\[([^\]]*)\]\s\"([^\"]+)\"\s5\d\d\s(\d+)$"#).unwrap(),
             "http_server_error", //500
         ),
     ];
@@ -43,6 +43,11 @@ pub fn parse(contents: &str) -> Vec<Event> {
                     Some(m) => Some(m.as_str().to_string()),
                     None => Some("".to_string()),
                 };
+
+                let size = match caps.get(4) {
+                    Some(m) => m.as_str().parse::<i64>().ok(),
+                    None => None,
+                }; 
                 
                 let event = Event {
                     timestamp,
@@ -52,6 +57,7 @@ pub fn parse(contents: &str) -> Vec<Event> {
                     event_type: event_type.to_string(),
                     command,
                     message: line.to_string(),
+                    size,
                 };
                 events.push(event);
                 

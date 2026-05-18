@@ -30,6 +30,8 @@ pub fn parse(contents: &str) -> Vec<Event> {
 
                 let command = None;
 
+                let size = None;
+
                 let event = Event {
                     timestamp,
                     source: "ufw".to_string(),
@@ -38,6 +40,7 @@ pub fn parse(contents: &str) -> Vec<Event> {
                     event_type: event_type.to_string(),
                     command,
                     message: line.to_string(),
+                    size,
                 };
             
                 events.push(event);

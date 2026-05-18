@@ -6,7 +6,6 @@ pub fn group(events: Vec<Event>) -> HashMap<String, Vec<Event>>{
 
     let mut actors: HashMap<String, Vec<Event>> = HashMap::new();
 
-    // toevoegen ip / user , event type
     for event in events{
         let actor = match &event.ip { 
             Some(ip) => ip.clone(),
