@@ -19,3 +19,11 @@ pub struct IntentResult {
     pub confidence: f64,
     pub evidence: Vec<String>,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ActorSummary {
+    pub actor: String,
+    pub intents: Vec<String>,
+    pub total_confidence: f64,
+    pub evidence: Vec<String>,
+}

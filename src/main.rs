@@ -15,7 +15,6 @@ use grouping::group;
 use detection::rules::analyze;
 use storage::mongo;
 
-use crate::storage::mongo::{save_events, save_results};
 
 
 
@@ -64,10 +63,15 @@ async fn main() {
     let results = analyze(actor, events);
         if !results.is_empty() {
             all_results.extend(results.clone());
-            println!("{:#?}", results);  
+            // println!("{:#?}", results);  
         }
     }
 
+    let results_per_actor = aggregate_results(all_results.clone());
+    let actor_total_summary =summarize(results_per_actor) ;
+    // println!("{:#?}", actor_total_summary); 
+
     save_events(&client, all_events_copy).await;
     save_results(&client, all_results).await;
+    save_actorsummary(&client, actor_total_summary).await;
 }
