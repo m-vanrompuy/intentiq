@@ -1,8 +1,12 @@
+
+
 use std::collections::HashMap;
+use chrono::NaiveDateTime;
 
 use crate::models::event::{ActorSummary, Event, IntentResult};
+use crate::utils::parse_timestamp;
 
-// events groeperen per actor
+// events groeperen per actor (enkele soort)
 pub fn group(events: Vec<Event>) -> HashMap<String, Vec<Event>>{
 
     let mut actors: HashMap<String, Vec<Event>> = HashMap::new();
@@ -24,7 +28,50 @@ pub fn group(events: Vec<Event>) -> HashMap<String, Vec<Event>>{
    return actors;
 }
 
-//intents / results groeperen per actor
+// linken van actors na een succesfull login en dus geen user meer heeft.
+pub fn link_orphan_events(actors: &mut HashMap<String, Vec<Event>>, all_events: &Vec<Event>) {
+    let mut successful_logins: Vec<(String, NaiveDateTime)> = Vec::new();
+    let mut userless_events:Vec<Event> = Vec::new();
+
+    for (actor, events) in actors.iter(){
+        for event in events{
+            if event.event_type == "ssh_login_success" {
+                if let Some(ts) = parse_timestamp(&event.timestamp) {
+                    successful_logins.push((actor.clone(), ts));
+                } 
+            }
+        }
+    }
+    
+    for event in all_events.iter(){
+        if event.ip.is_none() && event.user.is_none(){
+            userless_events.push(event.clone());
+        }
+
+    }
+
+    for event in userless_events{
+        if let Some(event_ts) = parse_timestamp(&event.timestamp){
+
+            let matching_actor = successful_logins.iter()
+                .filter(|(_, login_ts)| {
+                    let diff = event_ts.signed_duration_since(*login_ts);
+                    diff.num_seconds() >= 0 && diff.num_seconds() <= 300
+                })
+                .min_by_key(|(_, login_ts)| {
+                    event_ts.signed_duration_since(*login_ts).num_seconds()
+                });
+
+            if let Some((actor, _)) = matching_actor { 
+                actors.entry(actor.clone())
+                .or_insert_with(Vec::new)
+                .push(event.clone());
+            }
+        }
+    }
+}
+
+//alle soorten intents results groeperen per actor na analyze()
 pub fn aggregate_results(results:Vec<IntentResult>) -> HashMap<String, Vec<IntentResult>>{
 
     let mut results_per_actor: HashMap<String, Vec<IntentResult>> = HashMap::new();
