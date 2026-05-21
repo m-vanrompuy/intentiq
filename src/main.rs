@@ -4,6 +4,7 @@ mod grouping;
 mod detection;
 mod storage;
 mod output;
+mod utils;
 
 // use models::event::{Event, IntentResult};
 use std::fs::read_to_string;
@@ -11,11 +12,9 @@ use parser::auth::parse as parse_auth;
 use parser::syslog::parse as parse_syslog;
 use parser::ufw::parse as parse_ufw;
 use parser::nginx::parse as parse_nginx;
-use grouping::group;
-use detection::rules::analyze;
-use storage::mongo;
-
-
+use grouping::{group, link_orphan_events, aggregate_results, summarize};use detection::rules::analyze;
+use storage::mongo::{save_actorsummary, save_events, save_results};
+use crate::storage::mongo;
 
 
 #[tokio::main]
@@ -54,16 +53,18 @@ async fn main() {
     all_events.extend(parsed_content3);
     all_events.extend(parsed_content4);
     let all_events_copy = all_events.clone();
-    let actors = group(all_events);
+    let mut actors = group(all_events);
     // println!("{:#?}",actors);
+    
+    link_orphan_events(&mut actors, &all_events_copy);
+
 
     let mut all_results= Vec::new();
-
     for (actor, events) in &actors {
     let results = analyze(actor, events);
         if !results.is_empty() {
             all_results.extend(results.clone());
-            // println!("{:#?}", results);  
+            println!("{:#?}", results);  
         }
     }
 

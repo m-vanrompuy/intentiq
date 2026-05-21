@@ -1,8 +1,12 @@
+
+
 use std::collections::HashMap;
+use chrono::NaiveDateTime;
 
 use crate::models::event::{ActorSummary, Event, IntentResult};
+use crate::utils::parse_timestamp;
 
-// events groeperen per actor
+// events groeperen per actor (enkele soort)
 pub fn group(events: Vec<Event>) -> HashMap<String, Vec<Event>>{
 
     let mut actors: HashMap<String, Vec<Event>> = HashMap::new();
@@ -24,7 +28,61 @@ pub fn group(events: Vec<Event>) -> HashMap<String, Vec<Event>>{
    return actors;
 }
 
-//intents / results groeperen per actor
+// linken van actors na een succesfull login en dus geen user meer heeft.
+pub fn link_orphan_events(actors: &mut HashMap<String, Vec<Event>>, all_events: &Vec<Event>) {
+    let successful_logins = collect_successful_logins(actors);
+    let orphan_events = collect_orphan_events(all_events);
+    let mut linked_users: Vec<String> = Vec::new();
+
+    for event in orphan_events {
+        if let Some(actor) = find_matching_actor(&event, &successful_logins) {
+            track_linked_user(&event, &mut linked_users);
+            actors.entry(actor).or_insert_with(Vec::new).push(event);
+        }
+    }
+
+    for user in linked_users {
+        actors.remove(&user);
+    }
+}
+
+fn track_linked_user(event: &Event, linked_users: &mut Vec<String>) {
+    if let Some(user) = &event.user {
+        if !linked_users.contains(user) {
+            linked_users.push(user.clone());
+        }
+    }
+}
+
+fn collect_successful_logins(actors: &HashMap<String, Vec<Event>>) -> Vec<(String, NaiveDateTime)> {
+    actors.iter()
+        .flat_map(|(actor, events)| {
+            events.iter()
+                .filter(|e| e.event_type == "ssh_login_success")
+                .filter_map(|e| parse_timestamp(&e.timestamp).map(|ts| (actor.clone(), ts)))
+        })
+        .collect()
+}
+
+fn collect_orphan_events(all_events: &Vec<Event>) -> Vec<Event> {
+    all_events.iter()
+        .filter(|e| e.ip.is_none() && (e.user.is_none() || e.event_type == "sudo_command"))
+        .cloned()
+        .collect()
+}
+
+fn find_matching_actor(event: &Event, logins: &Vec<(String, NaiveDateTime)>) -> Option<String> {
+    let event_ts = parse_timestamp(&event.timestamp)?;
+    logins.iter()
+        .filter(|(_, login_ts)| {
+            let diff = event_ts.signed_duration_since(*login_ts);
+            diff.num_seconds() >= 0 && diff.num_seconds() <= 300
+        })
+        .min_by_key(|(_, login_ts)| event_ts.signed_duration_since(*login_ts).num_seconds())
+        .map(|(actor, _)| actor.clone())
+}
+
+//alle soorten intents results groeperen per actor na analyze()
 pub fn aggregate_results(results:Vec<IntentResult>) -> HashMap<String, Vec<IntentResult>>{
 
     let mut results_per_actor: HashMap<String, Vec<IntentResult>> = HashMap::new();

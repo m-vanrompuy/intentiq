@@ -90,7 +90,7 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
     // TODO: suspicious_binary events worden apart gegroepeerd van SSH login events
     // omdat ze geen IP of user hebben in syslog. Actor-linking is nog niet geïmplementeerd.
     // Zie issue #11 voor de oplossing.
-    if had_session && had_sudo && had_suspicious_binary {
+    if (had_session || success_login_message.is_some()) && had_sudo && had_suspicious_binary {
         results.push(IntentResult {
             actor: actor.to_string(),
             intent: "privilege_escalation + persistence".to_string(),
