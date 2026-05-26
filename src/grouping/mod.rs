@@ -7,7 +7,7 @@ use crate::models::event::{ActorSummary, Event, IntentResult};
 use crate::utils::parse_timestamp;
 
 // events groeperen per actor (enkele soort)
-pub fn group(events: Vec<Event>) -> HashMap<String, Vec<Event>>{
+pub fn group_events_per_actor(events: Vec<Event>) -> HashMap<String, Vec<Event>>{
 
     let mut actors: HashMap<String, Vec<Event>> = HashMap::new();
 
@@ -46,6 +46,7 @@ pub fn link_orphan_events(actors: &mut HashMap<String, Vec<Event>>, all_events: 
     }
 }
 
+    
 fn track_linked_user(event: &Event, linked_users: &mut Vec<String>) {
     if let Some(user) = &event.user {
         if !linked_users.contains(user) {
@@ -53,7 +54,7 @@ fn track_linked_user(event: &Event, linked_users: &mut Vec<String>) {
         }
     }
 }
-
+    //wie heeft wanneer ingelogd lijst
 fn collect_successful_logins(actors: &HashMap<String, Vec<Event>>) -> Vec<(String, NaiveDateTime)> {
     actors.iter()
         .flat_map(|(actor, events)| {
@@ -64,6 +65,7 @@ fn collect_successful_logins(actors: &HashMap<String, Vec<Event>>) -> Vec<(Strin
         .collect()
 }
 
+    //lijst van events zonder ip en zonder user
 fn collect_orphan_events(all_events: &Vec<Event>) -> Vec<Event> {
     all_events.iter()
         .filter(|e| e.ip.is_none() && (e.user.is_none() || e.event_type == "sudo_command"))
@@ -71,6 +73,7 @@ fn collect_orphan_events(all_events: &Vec<Event>) -> Vec<Event> {
         .collect()
 }
 
+    //gegeven een orphan event: zoekt dichtst bijzijnde login binnen 5 min
 fn find_matching_actor(event: &Event, logins: &Vec<(String, NaiveDateTime)>) -> Option<String> {
     let event_ts = parse_timestamp(&event.timestamp)?;
     logins.iter()
@@ -97,7 +100,7 @@ pub fn aggregate_results(results:Vec<IntentResult>) -> HashMap<String, Vec<Inten
     return  results_per_actor;
 }
 
-//maakt een summary van ALLE intents / results per actor met probalistische confidence totaal
+//maakt een summary van ALLE intents / results per actor met avg confidence totaal
 pub fn summarize(actorresults:HashMap<String, Vec<IntentResult>>) -> Vec<ActorSummary>{
     let mut summaries: Vec<ActorSummary> = Vec::new();
 
@@ -106,13 +109,15 @@ pub fn summarize(actorresults:HashMap<String, Vec<IntentResult>>) -> Vec<ActorSu
         .map(|r| r.intent.clone())
         .collect();
 
-        let evidence: Vec<String> = results.iter()
+        let mut evidence: Vec<String> = results.iter()
         .flat_map(|r| r.evidence.clone())
         .collect();
+        evidence.sort();
+        evidence.dedup();
 
-        //probalistische formule e.g. 1 - (1-0.75) * (1-0.85) * (1-0.88) = 0.995
-        let total_confidence = 1.0 - results.iter()
-        .fold(1.0, |acc, r| acc * (1.0 - r.confidence));
+        //avg formule
+        let total_confidence = results.iter().map(|r| r.confidence)
+        .sum::<f64>() / results.len() as f64;
 
         summaries.push(ActorSummary { 
             actor, 
