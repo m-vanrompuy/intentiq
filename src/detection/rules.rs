@@ -1,6 +1,7 @@
 use crate::models::event::Event;
 use crate::models::event::IntentResult;
 
+//kijkt of er iets suspicious is
 pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
     let mut results: Vec<IntentResult> = Vec::new();
     let mut login_count: i32 = 0;
