@@ -64,7 +64,7 @@ pub fn analyze(actor: &str, events: &Vec<Event>) -> Vec<IntentResult> {
     }
 
     //reconnaissance rule
-    if login_count >= 10 {
+    if login_count >= 5 {
         results.push(IntentResult {
             actor: actor.to_string(),
             intent: "reconnaissance".to_string(),

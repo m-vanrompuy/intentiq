@@ -38,12 +38,6 @@ async fn main() {
     let qdrant_client = qdrant::connect().await;
     qdrant::create_collection_if_not_exists(&qdrant_client).await;
 
-//     dotenv().ok();
-//    let api_key = env::var("OPENROUTER_API_KEY")
-//         .expect("OPENROUTER_API_KEY niet ingesteld");
-//     println!("API key geladen!");
-//     println!("Eerste 10 chars: {}", &api_key[..10]);
-
     let authcontents = read_to_string("logs/auth.log").expect("Could not read file");
     let parsed_content1 = parse_auth(&authcontents);
     // println!("{:#?}", parsed_content1);
@@ -70,7 +64,6 @@ async fn main() {
     // println!("{:#?}",actors);
     
     link_orphan_events(&mut actors, &all_events_copy);
-
 
     let mut all_results= Vec::new();
     for (actor, events) in &actors {

@@ -105,9 +105,11 @@ pub fn summarize(actorresults:HashMap<String, Vec<IntentResult>>) -> Vec<ActorSu
     let mut summaries: Vec<ActorSummary> = Vec::new();
 
     for (actor, results) in actorresults{
-        let intents: Vec<String> = results.iter()
+        let mut intents: Vec<String> = results.iter()
         .map(|r| r.intent.clone())
         .collect();
+        intents.sort();
+        intents.dedup();
 
         let mut evidence: Vec<String> = results.iter()
         .flat_map(|r| r.evidence.clone())

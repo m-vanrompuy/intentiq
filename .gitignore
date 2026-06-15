@@ -1,2 +1,8 @@
 /target
 .env
+Cargo.lock
+logs/auth.log
+logs/syslog
+logs/ufw.log
+logs/nginx/access.log
+
