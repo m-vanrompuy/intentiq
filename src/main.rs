@@ -20,6 +20,7 @@ use dotenv::dotenv;
 use std::env;
 use detection::filter_low_confidence;
 use detection::llm::analyze_with_llm;
+use output::report::print_report;
 
 
 #[tokio::main]
@@ -103,6 +104,7 @@ async fn main() {
         }
     }
 
+    print_report(&actor_total_summary);
 
     save_events(&client, all_events_copy).await;
     save_results(&client, all_results).await;
