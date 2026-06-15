@@ -14,6 +14,7 @@ use parser::ufw::parse as parse_ufw;
 use parser::nginx::parse as parse_nginx;
 use grouping::{group_events_per_actor, link_orphan_events, aggregate_results, summarize};use detection::rules::analyze;
 use storage::mongo::{save_actorsummary, save_events, save_results};
+use crate::storage::qdrant;
 use crate::storage::mongo;
 use dotenv::dotenv;
 use std::env;
@@ -34,6 +35,8 @@ async fn main() {
     println!("  cybersecurity log analyzer\n");
 
     let client = mongo::connect().await;
+    let qdrant_client = qdrant::connect().await;
+    qdrant::create_collection_if_not_exists(&qdrant_client).await;
 
 //     dotenv().ok();
 //    let api_key = env::var("OPENROUTER_API_KEY")
@@ -84,6 +87,11 @@ async fn main() {
 
     let low_conf_summaries = filter_low_confidence(&actor_total_summary);
     // println!("{:#?}", actor_total_summary);
+    for summary in &actor_total_summary {
+        qdrant::save_actor_vector(&qdrant_client, summary).await;
+        println!("Vector opgeslagen voor: {}", summary.actor);
+    }
+    
     for summary in &low_conf_summaries {
         if let Some(llm_summary) = analyze_with_llm(summary).await {
             println!("LLM analyse voor {}:\n  intents: {:?}\n  confidence: {}\n  evidence: {:?}", 
