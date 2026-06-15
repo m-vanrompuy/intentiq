@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 
 pub fn parse_timestamp(ts: &str) -> Option<NaiveDateTime> {
     // auth.log/syslog formaat: "May  6 09:16:01" → voeg jaar toe

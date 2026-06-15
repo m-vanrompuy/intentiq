@@ -16,8 +16,6 @@ use grouping::{group_events_per_actor, link_orphan_events, aggregate_results, su
 use storage::mongo::{save_actorsummary, save_events, save_results};
 use crate::storage::qdrant;
 use crate::storage::mongo;
-use dotenv::dotenv;
-use std::env;
 use detection::filter_low_confidence;
 use detection::llm::analyze_with_llm;
 use output::report::print_report;

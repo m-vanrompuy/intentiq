@@ -25,7 +25,7 @@ pub fn group_events_per_actor(events: Vec<Event>) -> HashMap<String, Vec<Event>>
         .push(event);
     }
 
-   return actors;
+    actors
 }
 
 // linken van actors na een succesfull login en dus geen user meer heeft.
@@ -97,7 +97,7 @@ pub fn aggregate_results(results:Vec<IntentResult>) -> HashMap<String, Vec<Inten
             .push(result);
     }
 
-    return  results_per_actor;
+    results_per_actor
 }
 
 //maakt een summary van ALLE intents / results per actor met avg confidence totaal
@@ -127,5 +127,5 @@ pub fn summarize(actorresults:HashMap<String, Vec<IntentResult>>) -> Vec<ActorSu
         });
     }
 
-    return summaries;
+    summaries
 }
