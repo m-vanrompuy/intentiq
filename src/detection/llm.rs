@@ -47,7 +47,7 @@ Geef ALLEEN het JSON object terug, geen andere tekst.",
     let client = reqwest::Client::new(); 
 
     let response = client
-        .post("http://localhost:11434/api/chat") // Ollama endpoint
+        .post("http://ollama:11434/api/chat") // Ollama endpoint
         .json(&body) 
         .send()
         .await.ok()?; 

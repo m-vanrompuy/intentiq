@@ -3,7 +3,7 @@ use crate::models::event::{ActorSummary, Event, IntentResult};
 
 
 pub async fn connect() -> Client {
-   Client::with_uri_str("mongodb://localhost:27017").await.unwrap()
+   Client::with_uri_str("mongodb://mongo:27017/intentiq").await.unwrap()
 }
 
 pub async fn save_events(client: &Client, events: Vec<Event>) {

@@ -24,11 +24,16 @@ May  6 09:25:01 server sshd[1090]: Failed password for invalid user root from 20
 May  6 09:25:02 server sshd[1090]: Failed password for invalid user pi from 203.0.113.55 port 22345 ssh2
 May  6 09:25:03 server sshd[1090]: Failed password for invalid user vagrant from 203.0.113.55 port 22345 ssh2
 May  6 09:25:04 server sshd[1090]: Failed password for invalid user user from 203.0.113.55 port 22345 ssh2
+May  6 09:25:05 server sshd[1090]: Failed password for invalid user test from 203.0.113.55 port 22345 ssh2
+May  6 09:25:06 server sshd[1090]: Failed password for invalid user guest from 203.0.113.55 port 22345 ssh2
 May  6 09:30:00 server sshd[1100]: Accepted password for lisa from 192.168.1.20 port 62000 ssh2
 May  6 09:31:00 server sudo: lisa : TTY=pts/2 ; PWD=/home/lisa ; COMMAND=/usr/bin/apt update
 May  6 09:45:00 server sshd[1120]: Failed password for invalid user admin from 198.51.100.77 port 55123 ssh2
 May  6 09:45:01 server sshd[1120]: Failed password for invalid user admin from 198.51.100.77 port 55124 ssh2
 May  6 09:45:02 server sshd[1120]: Failed password for invalid user admin from 198.51.100.77 port 55125 ssh2
+May  6 09:45:03 server sshd[1120]: Failed password for invalid user root from 198.51.100.77 port 55126 ssh2
+May  6 09:45:04 server sshd[1120]: Failed password for invalid user root from 198.51.100.77 port 55127 ssh2
+May  6 09:45:05 server sshd[1120]: Accepted password for deploy from 198.51.100.77 port 55128 ssh2
 May  6 09:50:00 server sshd[1130]: Accepted password for deploy from 192.168.1.30 port 49000 ssh2
 May  6 09:51:00 server sudo: deploy : TTY=pts/3 ; PWD=/var/www ; COMMAND=/usr/bin/systemctl restart nginx
 May  6 10:00:00 server sshd[1140]: Failed password for invalid user root from 185.220.101.12 port 41300 ssh2

@@ -34,6 +34,8 @@ async fn main() {
 "#);
     println!("  cybersecurity log analyzer\n");
 
+    tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+
     let client = mongo::connect().await;
     let qdrant_client = qdrant::connect().await;
     qdrant::create_collection_if_not_exists(&qdrant_client).await;

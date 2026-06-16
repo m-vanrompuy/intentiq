@@ -1,0 +1,43 @@
+services:
+  app:
+    build: .
+    container_name: intentiq-app
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/intentiq
+      QDRANT_URL: http://qdrant:6333
+    depends_on:
+      - mongo
+      - qdrant
+      - ollama
+
+  mongo:
+    image: mongo:latest
+    container_name: intentiq-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: intentiq-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: intentiq-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  mongo_data:
+  qdrant_data:
+  ollama_data:

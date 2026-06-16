@@ -9,7 +9,7 @@ const COLLECTION_NAME: &str = "actors";
 const VECTOR_SIZE: u64 = 768; 
 
 pub async fn connect() -> Qdrant {
-    Qdrant::from_url("http://localhost:6334").build().unwrap()
+    Qdrant::from_url("http://qdrant:6334").build().unwrap()
 }
 
 pub async fn create_collection_if_not_exists(client: &Qdrant) {
@@ -65,11 +65,11 @@ async fn get_embedding(text: &str) -> Vec<f32> {
     });
 
     let response = client
-        .post("http://localhost:11434/api/embed")
+        .post("http://ollama:11434/api/embed")
         .json(&body)
         .send()
         .await.unwrap();
-
+    
     let json: serde_json::Value = response.json().await.unwrap();
     
     json["embeddings"][0]
