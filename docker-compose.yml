@@ -1,6 +1,8 @@
 services:
   app:
     build: .
+    env_file:
+      - .env
     container_name: intentiq-app
     ports:
       - "3000:3000"
@@ -10,7 +12,6 @@ services:
     depends_on:
       - mongo
       - qdrant
-      - ollama
 
   mongo:
     image: mongo:latest
@@ -29,15 +30,6 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: intentiq-ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-
 volumes:
   mongo_data:
   qdrant_data:
-  ollama_data:

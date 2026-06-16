@@ -6,7 +6,7 @@ use crate::models::event::ActorSummary;
 
 
 const COLLECTION_NAME: &str = "actors";
-const VECTOR_SIZE: u64 = 768; 
+const VECTOR_SIZE: u64 = 1536; 
 
 pub async fn connect() -> Qdrant {
     Qdrant::from_url("http://qdrant:6334").build().unwrap()
@@ -58,21 +58,36 @@ pub async fn save_actor_vector(client: &Qdrant, summary: &ActorSummary) {
 
 async fn get_embedding(text: &str) -> Vec<f32> {
     let client = reqwest::Client::new();
+    let api_key =
+    std::env::var("OPENAI_API_KEY")
+        .expect("OPENAI_API_KEY not set");
     
+    let embed_model =
+    std::env::var("OPENAI_EMBED_MODEL")
+        .unwrap_or("text-embedding-3-small".to_string());
+
     let body = serde_json::json!({
-        "model": "nomic-embed-text",
+        "model": embed_model,
         "input": text
     });
 
     let response = client
-        .post("http://ollama:11434/api/embed")
+        .post("https://api.openai.com/v1/embeddings")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Content-Type", "application/json")
         .json(&body)
         .send()
-        .await.unwrap();
+        .await
+        .unwrap();
     
     let json: serde_json::Value = response.json().await.unwrap();
     
-    json["embeddings"][0]
+    // println!(
+    //     "EMBED RESPONSE:\n{}",
+    //     serde_json::to_string_pretty(&json).unwrap()
+    // );  
+
+    json["data"][0]["embedding"]
         .as_array().unwrap()
         .iter()
         .map(|v| v.as_f64().unwrap() as f32)

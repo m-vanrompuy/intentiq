@@ -1,4 +1,7 @@
 use crate::models::event::ActorSummary;
+use std::env;
+
+
 
 pub async fn analyze_with_llm(summary: &ActorSummary) -> Option<ActorSummary> {
     let evidence = summary
@@ -8,6 +11,12 @@ pub async fn analyze_with_llm(summary: &ActorSummary) -> Option<ActorSummary> {
     .cloned()
     .collect::<Vec<_>>()
     .join("\n- ");
+
+    let api_key = env::var("OPENAI_API_KEY").ok()?;
+
+    let chat_model =
+    env::var("OPENAI_CHAT_MODEL")
+        .unwrap_or("gpt-4o-mini".to_string());
 
     let prompt = format!(
         "Je bent een cybersecurity analyst. Analyseer de volgende actor en bepaal de aanvalsintentie.
@@ -33,28 +42,38 @@ Geef ALLEEN het JSON object terug, geen andere tekst.",
 
 
     let body = serde_json::json!({
-        "model": "llama3.2",
+        "model": chat_model,
         "messages": [
             {
                 "role": "user",
                 "content": prompt
             }
         ],
-        "stream": false,  // false = wacht op volledig antwoord, geen streaming
-        "format": "json"
+        "response_format": {
+            "type": "json_object"
+        }
     });
 
     let client = reqwest::Client::new(); 
 
     let response = client
-        .post("http://ollama:11434/api/chat") // Ollama endpoint
-        .json(&body) 
+        .post("https://api.openai.com/v1/chat/completions")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .header("Content-Type", "application/json")
+        .json(&body)
         .send()
-        .await.ok()?; 
+        .await
+        .ok()?; 
 
     let json: serde_json::Value = response.json().await.ok()?; 
 
-    let content = json["message"]["content"].as_str()?; 
+    // println!(
+    //     "OPENAI RESPONSE:\n{}",
+    //     serde_json::to_string_pretty(&json).unwrap()
+    // );
+
+    let content = json["choices"][0]["message"]["content"]
+    .as_str()?; 
 
     // println!("RAW MODEL OUTPUT:");
     // println!("{}", content);    
